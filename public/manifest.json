@@ -1,0 +1,23 @@
+{
+    "name": "Network Download",
+    "description": "下载network 资源",
+    "version": "1.0",
+    "manifest_version": 3,
+    "background": {
+        "service_worker": "background.js"
+    },
+    "permissions": [
+        "storage",
+        "activeTab",
+        "scripting",
+        "webRequest",
+        "webRequestBlocking",
+        "<all_urls>"
+    ],
+    "action": {
+        "default_title": "Click to view a popup"
+    },
+    "host_permissions": [
+        "*://*/*"
+    ]
+}
