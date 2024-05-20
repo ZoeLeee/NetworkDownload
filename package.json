@@ -11,10 +11,12 @@
   },
   "dependencies": {
     "@types/chrome": "^0.0.268",
+    "jszip": "^3.10.1",
     "preact": "^10.19.6"
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.8.2",
+    "@types/jszip": "^3.4.1",
     "typescript": "^5.2.2",
     "vite": "^5.2.0"
   }
