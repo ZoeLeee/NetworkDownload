@@ -1,9 +1,10 @@
-import { useEffect, useState } from "preact/hooks";
+import { useEffect, useState } from "react";
 import preactLogo from "./assets/preact.svg";
 import viteLogo from "/vite.svg";
 import "./app.css";
 import { getActivaTab } from "./utils/message";
 import JSZip from "jszip";
+import { ChakraProvider } from "@chakra-ui/react";
 
 function getFileNameFromUrl(url) {
   // 使用正则表达式从 URL 中提取文件名
@@ -69,6 +70,11 @@ export function App() {
         setList(message.data);
       }
     };
+
+    if(!chrome){
+      return 
+    }
+
     // 在 popup 页面中监听来自 background 页面的消息
     chrome.runtime.onMessage.addListener(callback);
 
@@ -85,11 +91,12 @@ export function App() {
   }, []);
 
   return (
-    <div className="w-full h-full">
-      {list.map((item, index) => (
-        <div key={index}>{item.url}</div>
-      ))}
-      {/* <ul role="list" className="divide-y divide-gray-100">
+    <ChakraProvider>
+      <div className="w-full h-full">
+        {list.map((item, index) => (
+          <div key={index}>{item.url}</div>
+        ))}
+        {/* <ul role="list" className="divide-y divide-gray-100">
         {list.map((item) => (
           <li key={item.url} className="flex justify-between gap-x-6 py-5">
             <div className="flex min-w-0 gap-x-4">
@@ -126,7 +133,8 @@ export function App() {
           </li>
         ))}
       </ul> */}
-      <button onClick={handleDownload}>下载</button>
-    </div>
+        <button onClick={handleDownload}>下载</button>
+      </div>
+    </ChakraProvider>
   );
 }
