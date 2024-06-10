@@ -29,23 +29,36 @@ chrome.action.onClicked.addListener((tab) => {
     });
 });
 
-const UrlMap = new Map<string, chrome.webRequest.WebRequestBodyDetails[]>()
+const UrlMap:Record<string, FileMap> = {}
+
 
 chrome.webRequest.onBeforeRequest.addListener(
     function (details) {
-        console.log('details: ', details);
+        let arr = UrlMap[details.initiator] as FileMap
 
-        let arr = UrlMap.get(details.initiator)
+        const parsedUrl=new URL(details.url);
 
         if (!arr) {
-            arr = []
+            arr ={}
             if (details.initiator) {
-                UrlMap.set(new URL(details.initiator).origin, arr)
+                UrlMap[parsedUrl.origin]=arr
             }
         }
 
-        if (!arr.some(a => a.url === details.url)) {
-            arr.push(details)
+        const origin = parsedUrl.origin;
+        const path = parsedUrl.pathname;
+        const directory = path.substring(0, path.lastIndexOf('/') + 1);
+        console.log('directory: ', directory);
+
+        let list=arr[directory]
+
+        if(!list){
+            list=[]
+            arr[directory]=list
+        }
+
+        if (!list.some(a => a.url === details.url)) {
+            list.push(details)
         }
         // {
         //     "documentId": "95F723C4FDD23C07E2533208C07F97A0",
@@ -75,8 +88,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     if (message.type === "get-data") {
         getActivaTab(message.data.origin).then(tab => {
             console.log('UrlMap: ', UrlMap);
-            console.log(tab);
-            chrome.runtime.sendMessage({ type: "send-data", data: UrlMap.get(new URL(tab.url).origin) });
+            chrome.runtime.sendMessage({ type: "send-data", data: UrlMap[new URL(tab.url).origin] });
         })
     }
 });

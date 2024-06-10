@@ -10,6 +10,7 @@
     "build:w": "vite build --watch"
   },
   "dependencies": {
+    "@chakra-ui/icons": "^2.1.1",
     "@chakra-ui/react": "^2.8.2",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
@@ -18,7 +19,6 @@
     "@types/react-dom": "npm:types-react-dom@rc",
     "framer-motion": "^11.2.10",
     "jszip": "^3.10.1",
-    "preact": "^10.19.6",
     "react": "^19.0.0-rc-6d3110b4d9-20240531",
     "react-dom": "^19.0.0-rc-6d3110b4d9-20240531"
   },

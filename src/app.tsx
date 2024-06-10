@@ -1,10 +1,30 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import preactLogo from "./assets/preact.svg";
 import viteLogo from "/vite.svg";
 import "./app.css";
 import { getActivaTab } from "./utils/message";
 import JSZip from "jszip";
-import { ChakraProvider } from "@chakra-ui/react";
+import {
+  Box,
+  Card,
+  CardBody,
+  ChakraProvider,
+  Heading,
+  List,
+  ListIcon,
+  ListItem,
+  Text,
+} from "@chakra-ui/react";
+import { Flex, Spacer } from "@chakra-ui/react";
+import { CheckCircleIcon } from "@chakra-ui/icons";
+import { FileMap } from "./types";
+import {
+  Accordion,
+  AccordionItem,
+  AccordionButton,
+  AccordionPanel,
+  AccordionIcon,
+} from "@chakra-ui/react";
 
 function getFileNameFromUrl(url) {
   // 使用正则表达式从 URL 中提取文件名
@@ -17,9 +37,7 @@ function getFileNameFromUrl(url) {
 }
 
 export function App() {
-  const [list, setList] = useState<chrome.webRequest.WebRequestBodyDetails[]>(
-    []
-  );
+  const [list, setList] = useState<FileMap>({});
 
   const handleDownload = () => {
     // 创建一个新的 JSZip 实例
@@ -31,7 +49,6 @@ export function App() {
     }));
     let len = resources.length;
     let i = 0;
-    console.log(`共${len}个资源`);
     // 下载并压缩资源
     Promise.all(
       resources.map(function (resource) {
@@ -44,7 +61,6 @@ export function App() {
           })
           .then(function (blob) {
             // 将下载的资源添加到压缩包中
-            console.log(`第${i++}/${len}个资源`);
             zip.file(resource.filename, blob);
           });
       })
@@ -63,16 +79,23 @@ export function App() {
       });
   };
 
+  const keys = Object.keys(list);
+
+  const getfileName = (url: string) => {
+    const arr = url.split("/");
+
+    return arr[arr.length - 1];
+  };
+
   useEffect(() => {
     const callback = function (message, sender, sendResponse) {
-      console.log("Message from background:", message);
       if (message.type === "send-data") {
         setList(message.data);
       }
     };
 
-    if(!chrome){
-      return 
+    if (!chrome) {
+      return;
     }
 
     // 在 popup 页面中监听来自 background 页面的消息
@@ -92,11 +115,46 @@ export function App() {
 
   return (
     <ChakraProvider>
-      <div className="w-full h-full">
-        {list.map((item, index) => (
+      <Box w="40%" bg="">
+        <Heading as="h3" size="lg">
+          资源列表
+        </Heading>
+        {keys.map((k) => {
+          return (
+            <Accordion key={k} allowToggle>
+              <AccordionItem>
+                <h2>
+                  <AccordionButton>
+                    <Box as="span" flex="1" textAlign="left">
+                      {k}
+                    </Box>
+                    <AccordionIcon />
+                  </AccordionButton>
+                </h2>
+                <AccordionPanel pb={4}>
+                  <List>
+                    {list[k].map((item) => {
+                      return (
+                        <ListItem key={item.url}>
+                          <Card size='sm' textAlign="left">
+                            <CardBody>
+                              <Text>{getfileName(item.url)}</Text>
+                            </CardBody>
+                          </Card>
+                        </ListItem>
+                      );
+                    })}
+                  </List>
+                </AccordionPanel>
+              </AccordionItem>
+            </Accordion>
+          );
+        })}
+      </Box>
+      {/* {list.map((item, index) => (
           <div key={index}>{item.url}</div>
-        ))}
-        {/* <ul role="list" className="divide-y divide-gray-100">
+        ))} */}
+      {/* <ul role="list" className="divide-y divide-gray-100">
         {list.map((item) => (
           <li key={item.url} className="flex justify-between gap-x-6 py-5">
             <div className="flex min-w-0 gap-x-4">
@@ -133,8 +191,12 @@ export function App() {
           </li>
         ))}
       </ul> */}
-        <button onClick={handleDownload}>下载</button>
-      </div>
+      {/* <button onClick={handleDownload}>下载</button> */}
+      <Flex color="white">
+        <Box flex="1" bg="">
+          <Text>Box 3</Text>
+        </Box>
+      </Flex>
     </ChakraProvider>
   );
 }
