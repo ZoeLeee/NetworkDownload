@@ -1,4 +1,3 @@
-export * from "./message"
 
 // 根据url获取文件名
 export function getFileNameFromUrl(url: string): string {

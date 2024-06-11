@@ -101,7 +101,7 @@ export function App() {
     const callback = function (message, sender, sendResponse) {
       if (message.type === "send-data") {
         console.log("message.data: ", message.data);
-        setList(message.data);
+        setList(message.data??[]);
       }
     };
 
