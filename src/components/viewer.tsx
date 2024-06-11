@@ -1,10 +1,15 @@
 import { Box, Image } from "@chakra-ui/react";
 import { is3DFile, isImageFile, isMediaFile } from "../utils";
 import { TResource } from "../types";
+import { Model3D } from "./model-3d";
 
 export const Viewer = ({ item }: { item: TResource }) => {
   if (is3DFile(item.url)) {
-    return <Box>3D</Box>;
+    return (
+      <Box width="100%" height="100%">
+        <Model3D item={item} />
+      </Box>
+    );
   }
   if (isImageFile(item.url)) {
     return (

@@ -168,7 +168,7 @@ export function App() {
       </ul> */}
       {/* <button onClick={handleDownload}>下载</button> */}
       <Flex w="100%" h="100%">
-        <Box w="40%" bg="" overflow="hidden" h="100%">
+        <Box w="40%" bg="" overflow="auto" h="100%">
           <Heading as="h3" size="lg">
             资源列表
           </Heading>

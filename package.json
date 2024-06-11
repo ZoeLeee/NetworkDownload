@@ -10,6 +10,8 @@
     "build:w": "vite build --watch"
   },
   "dependencies": {
+    "@babylonjs/core": "^7.10.2",
+    "@babylonjs/loaders": "^7.10.2",
     "@chakra-ui/icons": "^2.1.1",
     "@chakra-ui/react": "^2.8.2",
     "@emotion/react": "^11.11.4",
