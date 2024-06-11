@@ -5,11 +5,14 @@ import "./app.css";
 import { getActivaTab } from "./utils/message";
 import JSZip from "jszip";
 import {
+  Badge,
   Box,
+  Button,
   Card,
   CardBody,
   ChakraProvider,
   Heading,
+  IconButton,
   List,
   ListIcon,
   ListItem,
@@ -17,8 +20,8 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { Flex, Spacer } from "@chakra-ui/react";
-import { CheckCircleIcon } from "@chakra-ui/icons";
-import { FileMap } from "./types";
+import { DownloadIcon, ViewIcon } from "@chakra-ui/icons";
+import { FileMap, TResource } from "./types";
 import {
   Accordion,
   AccordionItem,
@@ -26,6 +29,7 @@ import {
   AccordionPanel,
   AccordionIcon,
 } from "@chakra-ui/react";
+import { Viewer } from "./components/viewer";
 
 function getFileNameFromUrl(url) {
   // 使用正则表达式从 URL 中提取文件名
@@ -39,6 +43,7 @@ function getFileNameFromUrl(url) {
 
 export function App() {
   const [list, setList] = useState<FileMap>({});
+  const [viewItem, setViewItem] = useState<TResource | null>(null);
 
   const handleDownload = () => {
     // 创建一个新的 JSZip 实例
@@ -88,9 +93,14 @@ export function App() {
     return arr[arr.length - 1];
   };
 
+  const look = (url: TResource) => {
+    setViewItem(url);
+  };
+
   useEffect(() => {
     const callback = function (message, sender, sendResponse) {
       if (message.type === "send-data") {
+        console.log("message.data: ", message.data);
         setList(message.data);
       }
     };
@@ -116,47 +126,6 @@ export function App() {
 
   return (
     <ChakraProvider>
-      <Box w="40%" bg="">
-        <Heading as="h3" size="lg">
-          资源列表
-        </Heading>
-        {keys.map((k) => {
-          return (
-            <Accordion key={k} allowToggle>
-              <AccordionItem>
-                <h2>
-                  <AccordionButton>
-                    <Box as="span" flex="1" textAlign="left">
-                      {k}
-                    </Box>
-                    <AccordionIcon />
-                  </AccordionButton>
-                </h2>
-                <AccordionPanel pb={4}>
-                  <List>
-                    {list[k].map((item) => {
-                      return (
-                        <ListItem key={item.url}>
-                          <Card size="sm" textAlign="left">
-                            <CardBody>
-                              <Flex justifyContent="space-between">
-                                <Tag variant="solid" size="sm" colorScheme="teal">
-                                  {item.resourceType}
-                                </Tag>
-                                <Text>{getfileName(item.url)}</Text>
-                              </Flex>
-                            </CardBody>
-                          </Card>
-                        </ListItem>
-                      );
-                    })}
-                  </List>
-                </AccordionPanel>
-              </AccordionItem>
-            </Accordion>
-          );
-        })}
-      </Box>
       {/* {list.map((item, index) => (
           <div key={index}>{item.url}</div>
         ))} */}
@@ -198,9 +167,74 @@ export function App() {
         ))}
       </ul> */}
       {/* <button onClick={handleDownload}>下载</button> */}
-      <Flex color="white">
+      <Flex w="100%" h="100%">
+        <Box w="40%" bg="" overflow="hidden" h="100%">
+          <Heading as="h3" size="lg">
+            资源列表
+          </Heading>
+          {keys.map((k) => {
+            return (
+              <Accordion key={k} allowToggle>
+                <AccordionItem>
+                  <h2>
+                    <AccordionButton>
+                      <Box as="span" flex="1" textAlign="left">
+                        {k}
+                      </Box>
+                      <AccordionIcon />
+                    </AccordionButton>
+                  </h2>
+                  <AccordionPanel pb={4}>
+                    <List>
+                      {list[k].map((item) => {
+                        return (
+                          <ListItem key={item.url}>
+                            <Card size="sm" textAlign="left">
+                              <CardBody>
+                                <Flex
+                                  justifyContent="space-between"
+                                  alignItems="center"
+                                >
+                                  <Badge
+                                    variant="solid"
+                                    size="sm"
+                                    colorScheme="teal"
+                                  >
+                                    {item.resourceType}
+                                  </Badge>
+                                  <Text>{getfileName(item.url)}</Text>
+                                  <Box>
+                                    <IconButton
+                                      size="sm"
+                                      fontSize="12px"
+                                      aria-label="download"
+                                      boxSize={10}
+                                      icon={<DownloadIcon />}
+                                    />
+                                    <IconButton
+                                      size="sm"
+                                      fontSize="12px"
+                                      aria-label="download"
+                                      boxSize={10}
+                                      icon={<ViewIcon />}
+                                      onClick={() => look(item)}
+                                    />
+                                  </Box>
+                                </Flex>
+                              </CardBody>
+                            </Card>
+                          </ListItem>
+                        );
+                      })}
+                    </List>
+                  </AccordionPanel>
+                </AccordionItem>
+              </Accordion>
+            );
+          })}
+        </Box>
         <Box flex="1" bg="">
-          <Text>Box 3</Text>
+          {viewItem && <Viewer item={viewItem} />}
         </Box>
       </Flex>
     </ChakraProvider>

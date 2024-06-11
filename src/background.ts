@@ -1,5 +1,5 @@
 import { FileMap, TResourceType } from "./types";
-import { is3DFile, isImageFile } from "./utils";
+import { getFileNameFromUrl, is3DFile, isImageFile } from "./utils";
 import { getActivaTab } from "./utils/message";
 
 const color = "#3aa757";
@@ -36,6 +36,7 @@ const UrlMap: Record<string, FileMap> = {}
 
 chrome.webRequest.onBeforeRequest.addListener(
     function (details) {
+
         let arr = UrlMap[details.initiator] as FileMap
 
         const parsedUrl = new URL(details.url);
@@ -47,10 +48,13 @@ chrome.webRequest.onBeforeRequest.addListener(
             }
         }
 
+        const fileName=getFileNameFromUrl(details.url)
+
+        if(!fileName.includes(".")) return;
+
         const origin = parsedUrl.origin;
         const path = parsedUrl.pathname;
         const directory = path.substring(0, path.lastIndexOf('/') + 1);
-        console.log('directory: ', directory);
 
         let list = arr[directory]
 

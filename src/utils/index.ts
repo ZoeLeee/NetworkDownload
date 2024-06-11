@@ -1,14 +1,14 @@
 export * from "./message"
 
 // 根据url获取文件名
-export function getFileNameFromUrl(url) {
-    // 使用正则表达式从 URL 中提取文件名
-    var matches = url.match(/\/([^\/?#]+)$/);
-    if (matches && matches.length > 1) {
-        return matches[1]; // 返回匹配到的文件名
-    } else {
-        return null; // 如果未匹配到文件名，返回 null
-    }
+export function getFileNameFromUrl(url: string): string {
+    // Create a URL object
+    const parsedUrl = new URL(url);
+    // Get the pathname from the URL object
+    const pathname = parsedUrl.pathname;
+    // Extract the file name from the pathname
+    const fileName = pathname.substring(pathname.lastIndexOf('/') + 1);
+    return fileName;
 }
 
 //是否是3D类型
