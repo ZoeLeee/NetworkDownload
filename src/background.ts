@@ -1,3 +1,5 @@
+import { FileMap, TResourceType } from "./types";
+import { is3DFile, isImageFile } from "./utils";
 import { getActivaTab } from "./utils/message";
 
 const color = "#3aa757";
@@ -29,19 +31,19 @@ chrome.action.onClicked.addListener((tab) => {
     });
 });
 
-const UrlMap:Record<string, FileMap> = {}
+const UrlMap: Record<string, FileMap> = {}
 
 
 chrome.webRequest.onBeforeRequest.addListener(
     function (details) {
         let arr = UrlMap[details.initiator] as FileMap
 
-        const parsedUrl=new URL(details.url);
+        const parsedUrl = new URL(details.url);
 
         if (!arr) {
-            arr ={}
+            arr = {}
             if (details.initiator) {
-                UrlMap[parsedUrl.origin]=arr
+                UrlMap[parsedUrl.origin] = arr
             }
         }
 
@@ -50,15 +52,27 @@ chrome.webRequest.onBeforeRequest.addListener(
         const directory = path.substring(0, path.lastIndexOf('/') + 1);
         console.log('directory: ', directory);
 
-        let list=arr[directory]
+        let list = arr[directory]
 
-        if(!list){
-            list=[]
-            arr[directory]=list
+        if (!list) {
+            list = []
+            arr[directory] = list
         }
 
         if (!list.some(a => a.url === details.url)) {
-            list.push(details)
+            let type:TResourceType = "Other"
+            if (is3DFile(details.url)) {
+                type = "3D"
+            } else if (isImageFile(details.url)) {
+                type = "Image"
+            } else {
+                //
+            }
+
+            list.push({
+                ...details,
+                resourceType: type
+            })
         }
         // {
         //     "documentId": "95F723C4FDD23C07E2533208C07F97A0",

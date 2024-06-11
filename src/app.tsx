@@ -13,6 +13,7 @@ import {
   List,
   ListIcon,
   ListItem,
+  Tag,
   Text,
 } from "@chakra-ui/react";
 import { Flex, Spacer } from "@chakra-ui/react";
@@ -136,9 +137,14 @@ export function App() {
                     {list[k].map((item) => {
                       return (
                         <ListItem key={item.url}>
-                          <Card size='sm' textAlign="left">
+                          <Card size="sm" textAlign="left">
                             <CardBody>
-                              <Text>{getfileName(item.url)}</Text>
+                              <Flex justifyContent="space-between">
+                                <Tag variant="solid" size="sm" colorScheme="teal">
+                                  {item.resourceType}
+                                </Tag>
+                                <Text>{getfileName(item.url)}</Text>
+                              </Flex>
                             </CardBody>
                           </Card>
                         </ListItem>
