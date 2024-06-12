@@ -5,6 +5,7 @@ import {
   ArcRotateCamera,
   BoundingInfo,
   Color3,
+  DracoCompression,
   Engine,
   FramingBehavior,
   Scene,
@@ -17,6 +18,16 @@ import "@babylonjs/loaders/glTF";
 let engine: Engine;
 let scene: Scene;
 let camera: ArcRotateCamera;
+
+DracoCompression.DefaultNumWorkers=0
+
+DracoCompression.Configuration = {
+  decoder: {
+    wasmUrl: "/libs/draco_wasm_wrapper_gltf.js",
+    wasmBinaryUrl:"/libs/draco_decoder_gltf.wasm",
+    fallbackUrl: "/libs/draco_decoder_gltf.js",
+  }
+}
 
 export const Model3D = ({ item }: { item: TResource }) => {
   const containerRef = useRef<HTMLCanvasElement | null>(null);
@@ -82,7 +93,10 @@ export const Model3D = ({ item }: { item: TResource }) => {
       // Attaches the camera to the canvas
       camera.attachControl(containerRef.current, true);
 
-      const helper = scene.createDefaultEnvironment();
+      const helper = scene.createDefaultEnvironment({
+        skyboxSize:1e3,
+        groundSize:1e3
+      });
 
       helper.setMainColor(Color3.Teal());
 
