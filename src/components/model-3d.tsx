@@ -37,7 +37,7 @@ export const Model3D = ({ item }: { item: TResource }) => {
 
   const startDebugger = () => {
     scene.debugLayer.show({
-      embedMode: true
+      embedMode: true,
     });
   };
 
@@ -53,7 +53,9 @@ export const Model3D = ({ item }: { item: TResource }) => {
 
       camera.upperAlphaLimit = null;
 
-      camera.alpha += Math.PI;
+      // camera.alpha += Math.PI;
+
+      camera.beta = 1;
 
       // Enable camera's behaviors
       camera.useFramingBehavior = true;
@@ -116,7 +118,10 @@ export const Model3D = ({ item }: { item: TResource }) => {
       });
 
       const onResize = () => {
-        engine.resize();
+        engine.setSize(
+          containerRef.current.parentElement.clientWidth,
+          containerRef.current.parentElement.clientHeight
+        );
       };
 
       window.addEventListener("resize", onResize);

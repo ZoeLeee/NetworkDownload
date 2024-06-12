@@ -45,11 +45,11 @@ export function App() {
   const [list, setList] = useState<FileMap>({});
   const [viewItem, setViewItem] = useState<TResource | null>(null);
 
-  const handleDownload = () => {
+  const handleDownload = (items: TResource[], name?: string) => {
     // 创建一个新的 JSZip 实例
     const zip = new JSZip();
 
-    const resources = list.map((item) => ({
+    const resources = items.map((item) => ({
       url: item.url,
       filename: getFileNameFromUrl(item.url),
     }));
@@ -80,7 +80,31 @@ export function App() {
         var url = URL.createObjectURL(content);
         var link = document.createElement("a");
         link.href = url;
-        link.download = "resources.zip";
+
+        if (name) {
+          const strs = name.split("/");
+          name = strs.pop();
+        }
+
+        link.download = name ? name + ".zip" : "resources.zip";
+        link.click();
+      });
+  };
+
+  const downloadUrl = (item: TResource) => {
+    fetch(item.url)
+      .then(function (response) {
+        if (!response.ok) {
+          throw new Error("下载失败: " + response.status);
+        }
+        return response.blob();
+      })
+      .then(function (blob) {
+        var url = URL.createObjectURL(blob);
+        var link = document.createElement("a");
+        link.href = url;
+        const name = getFileNameFromUrl(item.url);
+        link.download = name;
         link.click();
       });
   };
@@ -101,7 +125,7 @@ export function App() {
     const callback = function (message, sender, sendResponse) {
       if (message.type === "send-data") {
         console.log("message.data: ", message.data);
-        setList(message.data??[]);
+        setList(message.data ?? []);
       }
     };
 
@@ -181,6 +205,17 @@ export function App() {
                       <Box as="span" flex="1" textAlign="left">
                         {k}
                       </Box>
+                      <IconButton
+                        size="sm"
+                        fontSize="12px"
+                        aria-label="download"
+                        boxSize={10}
+                        icon={<DownloadIcon />}
+                        onClick={(evt) => {
+                          evt.stopPropagation();
+                          handleDownload(list[k], k);
+                        }}
+                      />
                       <AccordionIcon />
                     </AccordionButton>
                   </h2>
@@ -210,6 +245,7 @@ export function App() {
                                       aria-label="download"
                                       boxSize={10}
                                       icon={<DownloadIcon />}
+                                      onClick={() => downloadUrl(item)}
                                     />
                                     <IconButton
                                       size="sm"
@@ -233,7 +269,7 @@ export function App() {
             );
           })}
         </Box>
-        <Box flex="1" bg="">
+        <Box flex="1" bg="" minW={0}>
           {viewItem && <Viewer item={viewItem} />}
         </Box>
       </Flex>

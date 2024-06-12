@@ -1,4 +1,4 @@
-import { Box, Image } from "@chakra-ui/react";
+import { Box, Center, Image, Text } from "@chakra-ui/react";
 import { is3DFile, isImageFile, isMediaFile } from "../utils";
 import { TResource } from "../types";
 import { Model3D } from "./model-3d";
@@ -18,9 +18,11 @@ export const Viewer = ({ item }: { item: TResource }) => {
       </Box>
     );
   }
-  if (isMediaFile(item.url)) {
-    return <Box>Media</Box>;
-  }
+  // if (isMediaFile(item.url)) {
+  //   return <Box>Media</Box>;
+  // }
 
-  return <Box></Box>;
+  return <Center>
+    <Text fontSize='4xl'>功能正在发中。。。</Text>
+  </Center>;
 };
