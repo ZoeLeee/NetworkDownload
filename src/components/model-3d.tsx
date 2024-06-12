@@ -14,23 +14,32 @@ import {
 } from "@babylonjs/core";
 
 import "@babylonjs/loaders/glTF";
+import { Button } from "@chakra-ui/react";
+import "@babylonjs/core/Debug/debugLayer";
+import "@babylonjs/inspector";
 
 let engine: Engine;
 let scene: Scene;
 let camera: ArcRotateCamera;
 
-DracoCompression.DefaultNumWorkers=0
+DracoCompression.DefaultNumWorkers = 0;
 
 DracoCompression.Configuration = {
   decoder: {
     wasmUrl: "/libs/draco_wasm_wrapper_gltf.js",
-    wasmBinaryUrl:"/libs/draco_decoder_gltf.wasm",
+    wasmBinaryUrl: "/libs/draco_decoder_gltf.wasm",
     fallbackUrl: "/libs/draco_decoder_gltf.js",
-  }
-}
+  },
+};
 
 export const Model3D = ({ item }: { item: TResource }) => {
   const containerRef = useRef<HTMLCanvasElement | null>(null);
+
+  const startDebugger = () => {
+    scene.debugLayer.show({
+      embedMode: true
+    });
+  };
 
   const loadModel = () => {
     SceneLoader.LoadAssetContainer(item.url, "", scene, (assets) => {
@@ -94,13 +103,13 @@ export const Model3D = ({ item }: { item: TResource }) => {
       camera.attachControl(containerRef.current, true);
 
       const helper = scene.createDefaultEnvironment({
-        skyboxSize:1e3,
-        groundSize:1e3
+        skyboxSize: 1e3,
+        groundSize: 1e3,
       });
 
       helper.setMainColor(Color3.Teal());
 
-    //   loadModel();
+      //   loadModel();
 
       engine.runRenderLoop(() => {
         scene.render();
@@ -127,5 +136,19 @@ export const Model3D = ({ item }: { item: TResource }) => {
     loadModel();
   }, [item]);
 
-  return <canvas width="100%" height="100%" ref={containerRef}></canvas>;
+  return (
+    <>
+      <canvas width="100%" height="100%" ref={containerRef}></canvas>
+      <Button
+        position="absolute"
+        right="10px"
+        bottom="10px"
+        colorScheme="teal"
+        size="xs"
+        onClick={startDebugger}
+      >
+        debugger
+      </Button>
+    </>
+  );
 };

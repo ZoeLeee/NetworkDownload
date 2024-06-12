@@ -1,6 +1,6 @@
 {
-    "name": "Network Download",
-    "description": "下载network 资源",
+    "name": "Network Download Helper",
+    "description": "Network Download Helper",
     "version": "1.0",
     "manifest_version": 3,
     "background": {
