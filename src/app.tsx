@@ -13,6 +13,7 @@ import {
   ChakraProvider,
   Heading,
   IconButton,
+  Link,
   List,
   ListIcon,
   ListItem,
@@ -20,7 +21,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { Flex, Spacer } from "@chakra-ui/react";
-import { DownloadIcon, ViewIcon } from "@chakra-ui/icons";
+import { DownloadIcon, ViewIcon, HamburgerIcon } from "@chakra-ui/icons";
 import { FileMap, TResource } from "./types";
 import {
   Accordion,
@@ -30,12 +31,23 @@ import {
   AccordionIcon,
 } from "@chakra-ui/react";
 import { Viewer } from "./components/viewer";
+import {
+  Drawer,
+  DrawerBody,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerOverlay,
+  DrawerContent,
+  DrawerCloseButton,
+} from "@chakra-ui/react";
+import { Divider } from "@chakra-ui/react";
 
 function getFileNameFromUrl(url) {
   // 使用正则表达式从 URL 中提取文件名
-  var matches = url.match(/\/([^\/?#]+)$/);
+  const matches = url.match(/\/([^\/?#]+)$/);
   if (matches && matches.length > 1) {
     return matches[1]; // 返回匹配到的文件名
+    // biome-ignore lint/style/noUselessElse: <explanation>
   } else {
     return null; // 如果未匹配到文件名，返回 null
   }
@@ -44,6 +56,9 @@ function getFileNameFromUrl(url) {
 export function App() {
   const [list, setList] = useState<FileMap>({});
   const [viewItem, setViewItem] = useState<TResource | null>(null);
+  const [origin, setOrigin] = useState("");
+  const [open, setOpen] = useState(false);
+  const [origins, setOrigins] = useState<string[]>([]);
 
   const handleDownload = (items: TResource[], name?: string) => {
     // 创建一个新的 JSZip 实例
@@ -117,15 +132,39 @@ export function App() {
     return arr[arr.length - 1];
   };
 
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const getOriginList = () => {
+    setOpen(true);
+    chrome.runtime.sendMessage({
+      type: "get-origins",
+      data: {},
+    });
+  };
+
+  const selectOrigin = (origin) => {
+    chrome.runtime.sendMessage({
+      type: "get-data",
+      data: {
+        origin: origin,
+      },
+    });
+    handleClose();
+  };
+
   const look = (url: TResource) => {
     setViewItem(url);
   };
 
   useEffect(() => {
-    const callback = function (message, sender, sendResponse) {
+    const callback = (message, sender, sendResponse) => {
       if (message.type === "send-data") {
-        console.log("message.data: ", message.data);
+        setOrigin(message.origin ?? "");
         setList(message.data ?? []);
+      } else if (message.type === "send-origins") {
+        setOrigins(message.data ?? []);
       }
     };
 
@@ -139,7 +178,7 @@ export function App() {
     chrome.runtime.sendMessage({
       type: "get-data",
       data: {
-        origin: Number(new URLSearchParams(location.search).get("contentId")),
+        tabId: Number(new URLSearchParams(location.search).get("contentId")),
       },
     });
 
@@ -150,51 +189,13 @@ export function App() {
 
   return (
     <ChakraProvider>
-      {/* {list.map((item, index) => (
-          <div key={index}>{item.url}</div>
-        ))} */}
-      {/* <ul role="list" className="divide-y divide-gray-100">
-        {list.map((item) => (
-          <li key={item.url} className="flex justify-between gap-x-6 py-5">
-            <div className="flex min-w-0 gap-x-4">
-              <img
-                className="h-12 w-12 flex-none rounded-full bg-gray-50"
-                src={item.imageUrl}
-                alt=""
-              />
-              <div className="min-w-0 flex-auto">
-                <p className="text-sm font-semibold leading-6 text-gray-900">
-                  {item.name}
-                </p>
-                <p className="mt-1 truncate text-xs leading-5 text-gray-500">
-                  {item.email}
-                </p>
-              </div>
-            </div>
-            <div className="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
-              <p className="text-sm leading-6 text-gray-900">{item.role}</p>
-              {item.lastSeen ? (
-                <p className="mt-1 text-xs leading-5 text-gray-500">
-                  Last seen{" "}
-                  <time dateTime={item.lastSeenDateTime}>{item.lastSeen}</time>
-                </p>
-              ) : (
-                <div className="mt-1 flex items-center gap-x-1.5">
-                  <div className="flex-none rounded-full bg-emerald-500/20 p-1">
-                    <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                  </div>
-                  <p className="text-xs leading-5 text-gray-500">Online</p>
-                </div>
-              )}
-            </div>
-          </li>
-        ))}
-      </ul> */}
-      {/* <button onClick={handleDownload}>下载</button> */}
       <Flex w="100%" h="100%">
         <Box w="40%" bg="" overflow="auto" h="100%">
-          <Heading as="h3" size="lg">
-            资源列表
+          <Heading as="h5" size="sm">
+            Host: {origin}
+            <IconButton aria-label="more host" onClick={getOriginList}>
+              <HamburgerIcon />
+            </IconButton>
           </Heading>
           {keys.map((k) => {
             return (
@@ -202,7 +203,12 @@ export function App() {
                 <AccordionItem>
                   <h2>
                     <AccordionButton>
-                      <Box as="span" flex="1" textAlign="left">
+                      <Box
+                        as="span"
+                        flex="1"
+                        textAlign="left"
+                        overflow="hidden"
+                      >
                         {k}
                       </Box>
                       <IconButton
@@ -237,8 +243,10 @@ export function App() {
                                   >
                                     {item.resourceType}
                                   </Badge>
-                                  <Text>{getfileName(item.url)}</Text>
-                                  <Box>
+                                  <Text overflow="hidden">
+                                    {getfileName(item.url)}
+                                  </Text>
+                                  <Box w={120}>
                                     <IconButton
                                       size="sm"
                                       fontSize="12px"
@@ -273,6 +281,24 @@ export function App() {
           {viewItem && <Viewer item={viewItem} />}
         </Box>
       </Flex>
+      <Drawer placement="left" onClose={handleClose} isOpen={open}>
+        <DrawerOverlay />
+        <DrawerContent>
+          <DrawerHeader borderBottomWidth="1px">All Hosts</DrawerHeader>
+          <DrawerBody>
+            <List>
+              {origins.map((item) => {
+                return (
+                  <ListItem key={item} p={1} onClick={() => selectOrigin(item)}>
+                    <Link>{item}</Link>
+                    <Divider />
+                  </ListItem>
+                );
+              })}
+            </List>
+          </DrawerBody>
+        </DrawerContent>
+      </Drawer>
     </ChakraProvider>
   );
 }
