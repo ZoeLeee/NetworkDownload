@@ -8,13 +8,11 @@
     },
     "icons": {
         "128": "logo128.png"
-      },
+    },
     "permissions": [
         "storage",
         "activeTab",
-        "scripting",
         "webRequest",
-        "webRequestBlocking",
         "<all_urls>"
     ],
     "action": {
