@@ -21,7 +21,12 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { Flex, Spacer } from "@chakra-ui/react";
-import { DownloadIcon, ViewIcon, HamburgerIcon } from "@chakra-ui/icons";
+import {
+  DownloadIcon,
+  ViewIcon,
+  HamburgerIcon,
+  RepeatIcon,
+} from "@chakra-ui/icons";
 import { FileMap, TResource } from "./types";
 import {
   Accordion,
@@ -158,6 +163,35 @@ export function App() {
     setViewItem(url);
   };
 
+  const refresh = () => {
+    if (!origin) return;
+    chrome.tabs.query({ url: origin + "/*" }, function (tabs) {
+      if (tabs) {
+        for (const tab of tabs) {
+          chrome.tabs.reload(tab.id).then(() => {
+            // 监听标签页加载完成事件
+            chrome.tabs.onUpdated.addListener(function listener(
+              tabId,
+              changeInfo
+            ) {
+              if (tabId === tab.id && changeInfo.status === "complete") {
+                console.log(`Tab ${tab.id} loaded`);
+                // 移除监听器
+                chrome.tabs.onUpdated.removeListener(listener);
+                chrome.runtime.sendMessage({
+                  type: "get-data",
+                  data: {
+                    origin: origin,
+                  },
+                });
+              }
+            });
+          });
+        }
+      }
+    });
+  };
+
   useEffect(() => {
     const callback = (message, sender, sendResponse) => {
       if (message.type === "send-data") {
@@ -195,6 +229,9 @@ export function App() {
             Host: {origin}
             <IconButton aria-label="more host" onClick={getOriginList}>
               <HamburgerIcon />
+            </IconButton>
+            <IconButton aria-label="more host" onClick={refresh}>
+              <RepeatIcon />
             </IconButton>
           </Heading>
           {keys.map((k) => {

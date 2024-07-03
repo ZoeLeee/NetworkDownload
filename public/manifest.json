@@ -1,7 +1,7 @@
 {
-    "name": "Network Download Helper",
-    "description": "Network Download Helper",
-    "version": "1.0",
+    "name": "Network Assistant",
+    "description": "Used for managing network resources, it provides image previews, 3D resource previews, download services, and more.",
+    "version": "1.0.1",
     "manifest_version": 3,
     "background": {
         "service_worker": "background.js"
@@ -12,6 +12,7 @@
     "permissions": [
         "storage",
         "activeTab",
+        "tabs",
         "webRequest",
         "<all_urls>"
     ],
