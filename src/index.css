@@ -1,16 +1,16 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@layer tailwind-base, primereact, tailwind-utilities;
 
-:root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+/* IMPORTANT: In "styled" mode you must add the PrimeReact Theme here. Do NOT include in "unstyled" mode */
+@import "primereact/resources/themes/lara-light-blue/theme.css"
+  layer(primereact);
+
+@layer tailwind-base {
+  @tailwind base;
 }
 
-* {
-  padding: 0;
-  margin: 0;
+@layer tailwind-utilities {
+  @tailwind components;
+  @tailwind utilities;
 }
 
 html {
@@ -19,7 +19,7 @@ html {
 }
 
 body {
-  overflow-x: hidden;
+  overflow: hidden;
   width: 100%;
   height: 100%;
 }

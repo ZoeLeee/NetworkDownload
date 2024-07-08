@@ -1,51 +1,20 @@
-import { useEffect, useMemo, useState } from "react";
-import preactLogo from "./assets/preact.svg";
-import viteLogo from "/vite.svg";
-import "./app.css";
-import { getActivaTab } from "./utils/message";
 import JSZip from "jszip";
-import {
-  Badge,
-  Box,
-  Button,
-  Card,
-  CardBody,
-  ChakraProvider,
-  Heading,
-  IconButton,
-  Link,
-  List,
-  ListIcon,
-  ListItem,
-  Tag,
-  Text,
-} from "@chakra-ui/react";
-import { Flex, Spacer } from "@chakra-ui/react";
-import {
-  DownloadIcon,
-  ViewIcon,
-  HamburgerIcon,
-  RepeatIcon,
-} from "@chakra-ui/icons";
+import { useEffect, useState } from "react";
+import "./app.css";
+
 import { FileMap, TResource } from "./types";
-import {
-  Accordion,
-  AccordionItem,
-  AccordionButton,
-  AccordionPanel,
-  AccordionIcon,
-} from "@chakra-ui/react";
+
 import { Viewer } from "./components/viewer";
-import {
-  Drawer,
-  DrawerBody,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerOverlay,
-  DrawerContent,
-  DrawerCloseButton,
-} from "@chakra-ui/react";
-import { Divider } from "@chakra-ui/react";
+
+import { PrimeReactProvider } from "primereact/api";
+import { Button } from "primereact/button";
+import { Divider } from "primereact/divider";
+import { InputText } from "primereact/inputtext";
+import { Flex } from "./components/flex";
+import { Origins } from "./components/origins";
+import { Resource } from "./components/resource";
+import { Text } from "./components/text";
+import { SpeedDial } from "primereact/speeddial";
 
 function getFileNameFromUrl(url) {
   // 使用正则表达式从 URL 中提取文件名
@@ -129,34 +98,28 @@ export function App() {
       });
   };
 
-  const keys = Object.keys(list);
-
   const getfileName = (url: string) => {
     const arr = url.split("/");
 
     return arr[arr.length - 1];
   };
 
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-  const getOriginList = () => {
-    setOpen(true);
-    chrome.runtime.sendMessage({
-      type: "get-origins",
-      data: {},
-    });
-  };
-
-  const selectOrigin = (origin) => {
+  const handleChangeOrigin = (origin: string) => {
+    setOrigin(origin);
     chrome.runtime.sendMessage({
       type: "get-data",
       data: {
         origin: origin,
       },
     });
-    handleClose();
+  };
+
+  const getOriginList = () => {
+    // setOpen(true);
+    chrome.runtime.sendMessage({
+      type: "get-origins",
+      data: {},
+    });
   };
 
   const look = (url: TResource) => {
@@ -215,6 +178,7 @@ export function App() {
         tabId: Number(new URLSearchParams(location.search).get("contentId")),
       },
     });
+    getOriginList();
 
     return () => {
       chrome.runtime.onMessage.removeListener(callback);
@@ -222,120 +186,52 @@ export function App() {
   }, []);
 
   return (
-    <ChakraProvider>
-      <Flex w="100%" h="100%">
-        <Box w="40%" bg="" overflow="auto" h="100%">
-          <Heading as="h5" size="sm">
-            Host: {origin}
-            <IconButton aria-label="more host" onClick={getOriginList}>
-              <HamburgerIcon />
-            </IconButton>
-            <IconButton aria-label="more host" onClick={refresh}>
-              <RepeatIcon />
-            </IconButton>
-          </Heading>
-          {keys.map((k) => {
-            return (
-              <Accordion key={k} allowToggle>
-                <AccordionItem>
-                  <h2>
-                    <AccordionButton>
-                      <Box
-                        as="span"
-                        flex="1"
-                        textAlign="left"
-                        overflow="hidden"
-                      >
-                        {k}
-                      </Box>
-                      <IconButton
-                        size="sm"
-                        fontSize="12px"
-                        aria-label="download"
-                        boxSize={10}
-                        icon={<DownloadIcon />}
-                        onClick={(evt) => {
-                          evt.stopPropagation();
-                          handleDownload(list[k], k);
-                        }}
-                      />
-                      <AccordionIcon />
-                    </AccordionButton>
-                  </h2>
-                  <AccordionPanel pb={4}>
-                    <List>
-                      {list[k].map((item) => {
-                        return (
-                          <ListItem key={item.url}>
-                            <Card size="sm" textAlign="left">
-                              <CardBody>
-                                <Flex
-                                  justifyContent="space-between"
-                                  alignItems="center"
-                                >
-                                  <Badge
-                                    variant="solid"
-                                    size="sm"
-                                    colorScheme="teal"
-                                  >
-                                    {item.resourceType}
-                                  </Badge>
-                                  <Text overflow="hidden">
-                                    {getfileName(item.url)}
-                                  </Text>
-                                  <Box w={120}>
-                                    <IconButton
-                                      size="sm"
-                                      fontSize="12px"
-                                      aria-label="download"
-                                      boxSize={10}
-                                      icon={<DownloadIcon />}
-                                      onClick={() => downloadUrl(item)}
-                                    />
-                                    <IconButton
-                                      size="sm"
-                                      fontSize="12px"
-                                      aria-label="download"
-                                      boxSize={10}
-                                      icon={<ViewIcon />}
-                                      onClick={() => look(item)}
-                                    />
-                                  </Box>
-                                </Flex>
-                              </CardBody>
-                            </Card>
-                          </ListItem>
-                        );
-                      })}
-                    </List>
-                  </AccordionPanel>
-                </AccordionItem>
-              </Accordion>
-            );
-          })}
-        </Box>
-        <Box flex="1" bg="" minW={0}>
-          {viewItem && <Viewer item={viewItem} />}
-        </Box>
-      </Flex>
-      <Drawer placement="left" onClose={handleClose} isOpen={open}>
-        <DrawerOverlay />
-        <DrawerContent>
-          <DrawerHeader borderBottomWidth="1px">All Hosts</DrawerHeader>
-          <DrawerBody>
-            <List>
-              {origins.map((item) => {
-                return (
-                  <ListItem key={item} p={1} onClick={() => selectOrigin(item)}>
-                    <Link>{item}</Link>
-                    <Divider />
-                  </ListItem>
-                );
-              })}
-            </List>
-          </DrawerBody>
-        </DrawerContent>
-      </Drawer>
-    </ChakraProvider>
+    <PrimeReactProvider>
+      <div className="flex flex-col w-full h-full pb-5 border-b border-gray-100">
+        {/* <Flex className="items-center h-10 p-2 gap-10">
+          <Text className="text-lg font-bold">{origin}</Text>
+          <Flex className="flex-1 flex items-center h-full overflow-hidden">
+            <InputText size="small" />
+            <Button icon="pi pi-search" size="small" />
+          </Flex>
+        </Flex> */}
+        <Flex className="flex-1 min-h-0 overflow-hidden">
+          <Origins
+            origins={origins}
+            origin={origin}
+            setOrigin={handleChangeOrigin}
+          />
+          <Divider layout="vertical" />
+          <Resource list={list} look={look} />
+          <Divider layout="vertical" />
+          <div className="flex-1 w-full h-full overflow-hidden">
+            {viewItem && <Viewer item={viewItem} />}
+          </div>
+        </Flex>
+        <SpeedDial
+          model={[
+            {
+              label: "Update",
+              icon: "pi pi-refresh",
+              command: () => {
+                refresh();
+              },
+            },
+          ]}
+          direction="up"
+          style={{ right: 10, bottom: 10 }}
+          pt={{
+            button: {
+              root: {
+                style: {
+                  width: "3rem",
+                  height: "3rem",
+                },
+              },
+            },
+          }}
+        />
+      </div>
+    </PrimeReactProvider>
   );
 }

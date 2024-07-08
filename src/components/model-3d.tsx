@@ -14,9 +14,9 @@ import {
 } from "@babylonjs/core";
 
 import "@babylonjs/loaders/glTF";
-import { Button } from "@chakra-ui/react";
 import "@babylonjs/core/Debug/debugLayer";
 import "@babylonjs/inspector";
+import { Button } from "primereact/button";
 
 let engine: Engine;
 let scene: Scene;
@@ -142,18 +142,14 @@ export const Model3D = ({ item }: { item: TResource }) => {
   }, [item]);
 
   return (
-    <>
+    <div className="w-full h-full relative">
       <canvas width="100%" height="100%" ref={containerRef}></canvas>
       <Button
-        position="absolute"
-        right="10px"
-        bottom="10px"
-        colorScheme="teal"
-        size="xs"
         onClick={startDebugger}
-      >
-        debugger
-      </Button>
-    </>
+        label="Debugger"
+        className="absolute left-5 bottom-5"
+        size="small"
+      />
+    </div>
   );
 };
