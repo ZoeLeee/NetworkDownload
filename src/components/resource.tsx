@@ -1,5 +1,5 @@
 import { PanelMenu } from "primereact/panelmenu";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { FileMap, TResource } from "../types";
 import { MenuItem, MenuItemOptions } from "primereact/menuitem";
 import { Button } from "primereact/button";
@@ -10,9 +10,12 @@ import JSZip from "jszip";
 type Props = {
   list: FileMap;
   look: (url: TResource) => void;
+  origin: string;
 };
 
-export const Resource = ({ list, look }: Props) => {
+export const Resource = ({ list, look, origin }: Props) => {
+  const [expandedKeys, setExpandedKeys] = useState<any>({});
+
   const downloadUrl = (item: TResource) => {
     fetch(item.url)
       .then(function (response) {
@@ -133,6 +136,7 @@ export const Resource = ({ list, look }: Props) => {
     for (const key of keys) {
       nodes.push({
         label: key,
+        key: key,
         data: {
           dir: true,
           items: list[key],
@@ -142,6 +146,7 @@ export const Resource = ({ list, look }: Props) => {
         items: list[key].map((item) => {
           return {
             label: getFileNameFromUrl(item.url),
+            key: item.url,
             data: {
               dir: false,
               resourceType: item.resourceType,
@@ -156,12 +161,27 @@ export const Resource = ({ list, look }: Props) => {
     return nodes;
   }, [list]);
 
+  useEffect(() => {
+    const keys = Object.keys(list);
+    setExpandedKeys(
+      keys.reduce((acc, key) => {
+        acc[key] = true;
+        return acc;
+      }, {})
+    );
+  }, [origin]);
+
   return (
     <div className="w-1/4 h-full overflow-auto">
       <PanelMenu
         multiple
         model={items}
         className="w-full h-full"
+        expandedKeys={expandedKeys}
+        onExpandedKeysChange={(e, ...arg) => {
+          console.log("e: ", e);
+          setExpandedKeys(e);
+        }}
         pt={{
           header: {},
           headerLabel: {

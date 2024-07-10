@@ -5,12 +5,12 @@ import { resolve } from "path";
 // https://vitejs.dev/config/
 export default defineConfig({
 	build: {
+		watch: {
+			exclude: ["src/background.ts"],
+		},
 		emptyOutDir: process.env.CLEAR === "true",
 		minify: false,
 		rollupOptions: {
-			input: {
-				index: resolve(__dirname, "index.html"),
-			},
 			output: {
 				entryFileNames: (info) => {
 					return "assets/[name].js";

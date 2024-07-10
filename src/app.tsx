@@ -1,5 +1,5 @@
 import JSZip from "jszip";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import "./app.css";
 
 import { FileMap, TResource } from "./types";
@@ -15,6 +15,7 @@ import { Origins } from "./components/origins";
 import { Resource } from "./components/resource";
 import { Text } from "./components/text";
 import { SpeedDial } from "primereact/speeddial";
+import { Header, TFilter } from "./components/header";
 
 function getFileNameFromUrl(url) {
   // 使用正则表达式从 URL 中提取文件名
@@ -34,75 +35,38 @@ export function App() {
   const [open, setOpen] = useState(false);
   const [origins, setOrigins] = useState<string[]>([]);
 
-  const handleDownload = (items: TResource[], name?: string) => {
-    // 创建一个新的 JSZip 实例
-    const zip = new JSZip();
+  const [query, setQuery] = useState<TFilter>({
+    query: "",
+    type: "Resource",
+    resourceTypes: [],
+  });
 
-    const resources = items.map((item) => ({
-      url: item.url,
-      filename: getFileNameFromUrl(item.url),
-    }));
-    let len = resources.length;
-    let i = 0;
-    // 下载并压缩资源
-    Promise.all(
-      resources.map(function (resource) {
-        return fetch(resource.url)
-          .then(function (response) {
-            if (!response.ok) {
-              throw new Error("下载失败: " + response.status);
+  const [filterOrigins, filterList] = useMemo(() => {
+    let os = origins.slice();
+    let rs = { ...list };
+
+    if (query.type === "Host") {
+      if (query.query) {
+        os = os.filter((item) => item.includes(query.query));
+      }
+    } else {
+      if (query.query || query.resourceTypes.length > 0) {
+        for (let k in rs) {
+          rs[k] = rs[k].filter((item) => {
+            let v = item.url.includes(query.query);
+            if (query.resourceTypes.length > 0) {
+              v = v && query.resourceTypes.includes(item.resourceType);
             }
-            return response.blob();
-          })
-          .then(function (blob) {
-            // 将下载的资源添加到压缩包中
-            zip.file(resource.filename, blob);
+            return v;
           });
-      })
-    )
-      .then(function () {
-        // 生成压缩包
-        return zip.generateAsync({ type: "blob" });
-      })
-      .then(function (content) {
-        // 下载压缩包
-        var url = URL.createObjectURL(content);
-        var link = document.createElement("a");
-        link.href = url;
 
-        if (name) {
-          const strs = name.split("/");
-          name = strs.pop();
+          if (rs[k].length === 0) delete rs[k];
         }
+      }
+    }
 
-        link.download = name ? name + ".zip" : "resources.zip";
-        link.click();
-      });
-  };
-
-  const downloadUrl = (item: TResource) => {
-    fetch(item.url)
-      .then(function (response) {
-        if (!response.ok) {
-          throw new Error("下载失败: " + response.status);
-        }
-        return response.blob();
-      })
-      .then(function (blob) {
-        var url = URL.createObjectURL(blob);
-        var link = document.createElement("a");
-        link.href = url;
-        const name = getFileNameFromUrl(item.url);
-        link.download = name;
-        link.click();
-      });
-  };
-
-  const getfileName = (url: string) => {
-    const arr = url.split("/");
-
-    return arr[arr.length - 1];
-  };
+    return [os, rs];
+  }, [query, origins, list]);
 
   const handleChangeOrigin = (origin: string) => {
     setOrigin(origin);
@@ -120,6 +84,10 @@ export function App() {
       type: "get-origins",
       data: {},
     });
+  };
+
+  const handleSearch = (filter: TFilter) => {
+    setQuery(filter);
   };
 
   const look = (url: TResource) => {
@@ -187,22 +155,16 @@ export function App() {
 
   return (
     <PrimeReactProvider>
-      <div className="flex flex-col w-full h-full pb-5 border-b border-gray-100">
-        {/* <Flex className="items-center h-10 p-2 gap-10">
-          <Text className="text-lg font-bold">{origin}</Text>
-          <Flex className="flex-1 flex items-center h-full overflow-hidden">
-            <InputText size="small" />
-            <Button icon="pi pi-search" size="small" />
-          </Flex>
-        </Flex> */}
+      <div className="flex flex-col w-full h-full">
+        <Header origin={origin} onChange={handleSearch} filter={query} />
         <Flex className="flex-1 min-h-0 overflow-hidden">
           <Origins
-            origins={origins}
+            origins={filterOrigins}
             origin={origin}
             setOrigin={handleChangeOrigin}
           />
           <Divider layout="vertical" />
-          <Resource list={list} look={look} />
+          <Resource list={filterList} look={look} origin={origin} />
           <Divider layout="vertical" />
           <div className="flex-1 w-full h-full overflow-hidden">
             {viewItem && <Viewer item={viewItem} />}

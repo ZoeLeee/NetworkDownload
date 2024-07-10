@@ -16,8 +16,8 @@ chrome.action.onClicked.addListener((tab) => {
 			{
 				url: chrome.runtime.getURL(`index.html?contentId=${tabs[0]?.id}`),
 				type: "popup",
-				width: 1024,
-				height: 860,
+				width: 1340,
+				height: 960,
 				// left: (tab.width - 800) * 0.5,
 				// top: (tab.height - 800) * 0.5,
 			},
