@@ -11,7 +11,7 @@
     "build:w": "vite build --watch",
     "build2:w": "vite build --config vite.backgroud.config.ts --watch",
     "build3:w": "vite build --config vite.content.config.ts --watch",
-    "bw": "run-p build:w build2:w",
+    "bw": "run-p build:w build2:w build3:w",
     "build": "cross-env CLEAR=true run-s build:client build:bg"
   },
   "dependencies": {
