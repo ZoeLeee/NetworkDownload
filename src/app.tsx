@@ -70,14 +70,14 @@ export function App() {
     return [os, rs];
   }, [query, origins, list]);
 
-  const handleChangeOrigin = (origin?: string) => {
-    if (origin) {
-      setOrigin(origin);
+  const handleChangeOrigin = (o?: string) => {
+    if (o) {
+      setOrigin(o);
     }
     chrome.runtime.sendMessage({
       type: "get-data",
       data: {
-        origin: origin,
+        origin: o ?? origin,
       },
     });
   };
@@ -105,27 +105,14 @@ export function App() {
       if (tabs) {
         setLoading(true);
         for (const tab of tabs) {
-          chrome.tabs.reload(tab.id).then(() => {
-            // 监听标签页加载完成事件
-            chrome.tabs.onUpdated.addListener(function listener(
-              tabId,
-              changeInfo
-            ) {
-              if (tabId === tab.id && changeInfo.status === "complete") {
-                console.log(`Tab ${tab.id} loaded`);
-                // 移除监听器
-                chrome.tabs.onUpdated.removeListener(listener);
-                setTimeout(() => {
-                  getOriginList();
-                  handleChangeOrigin(origin);
-                  setLoading(false);
-                }, 100);
-              }
-            });
-          });
+          chrome.tabs.reload(tab.id);
         }
       }
     });
+  };
+
+  const sync = () => {
+    handleChangeOrigin();
   };
 
   useEffect(() => {
@@ -135,6 +122,10 @@ export function App() {
         setList(message.data ?? []);
       } else if (message.type === "send-origins") {
         setOrigins(message.data ?? []);
+      } else if (message.type === "page-load") {
+        getOriginList();
+        handleChangeOrigin(origin);
+        setLoading(false);
       }
     };
 
@@ -199,7 +190,13 @@ export function App() {
             },
           }}
         /> */}
-        <div className="fixed right-5 bottom-5">
+        <div className="fixed right-5 bottom-5 flex flex-col gap-5">
+          <Button
+            icon="pi pi-sync"
+            rounded
+            severity="secondary"
+            onClick={sync}
+          />
           <Button
             icon="pi pi-refresh"
             rounded

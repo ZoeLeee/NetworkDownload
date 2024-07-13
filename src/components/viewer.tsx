@@ -3,6 +3,7 @@ import { TResource } from "../types";
 import { Model3D } from "./model-3d";
 import { Text } from "./text";
 import { Image } from "primereact/image";
+import { Media } from "./media";
 
 export const Viewer = ({ item }: { item: TResource }) => {
   if (is3DFile(item.url)) {
@@ -19,9 +20,9 @@ export const Viewer = ({ item }: { item: TResource }) => {
       </div>
     );
   }
-  // if (isMediaFile(item.url)) {
-  //   return <Box>Media</Box>;
-  // }
+  if (isMediaFile(item.url)) {
+    return <Media item={item} />;
+  }
 
   return (
     <div className="w-full h-full text-center">

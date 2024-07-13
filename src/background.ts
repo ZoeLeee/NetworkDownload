@@ -1,5 +1,10 @@
 import { FileMap, TResourceType } from "./types";
-import { getFileNameFromUrl, is3DFile, isImageFile } from "./utils";
+import {
+	getFileNameFromUrl,
+	is3DFile,
+	isImageFile,
+	isMediaFile,
+} from "./utils";
 import { getActivaTab } from "./utils/message";
 
 const color = "#3aa757";
@@ -9,8 +14,12 @@ chrome.runtime.onInstalled.addListener(() => {
 	console.log("Default background color set to %cgreen", `color: ${color}`);
 });
 
+let appWindow: chrome.windows.Window;
+
 chrome.action.onClicked.addListener((tab) => {
 	chrome.tabs.query({ active: true }, (tabs) => {
+		// chrome.windows.get(appWindow.id)
+
 		// 创建窗口
 		chrome.windows.create(
 			{
@@ -23,6 +32,7 @@ chrome.action.onClicked.addListener((tab) => {
 			},
 			(win) => {
 				console.log("ok");
+				appWindow = win;
 			},
 		);
 	});
@@ -64,6 +74,8 @@ chrome.webRequest.onBeforeRequest.addListener(
 				type = "3D";
 			} else if (isImageFile(details.url)) {
 				type = "Image";
+			} else if (isMediaFile(details.url)) {
+				type = "Media";
 			} else {
 				//
 			}
@@ -119,6 +131,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 			type: "send-origins",
 			origin: origin,
 			data: Object.keys(UrlMap).filter((item) => item.startsWith("http")),
+		});
+	} else if (message.type === "load") {
+		chrome.runtime.sendMessage({
+			type: "page-load",
+			origin: message.origin,
 		});
 	}
 });

@@ -48,6 +48,7 @@ export const Header = ({ origin, filter, onChange }: Props) => {
           options={[
             { name: "3D", value: "3D" },
             { name: "Image", value: "Image" },
+            { name: "Media", value: "Media" },
             { name: "Other", value: "Other" },
           ]}
           className="w-3/12"

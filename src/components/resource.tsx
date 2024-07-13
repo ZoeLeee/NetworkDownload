@@ -101,6 +101,7 @@ export const Resource = ({ list, look, origin }: Props) => {
         )}
         <span
           className={`flex-1 min-w-0 text-ellipsis overflow-hidden whitespace-nowrap`}
+          title={item.label}
         >
           {item.label}
         </span>
