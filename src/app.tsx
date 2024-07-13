@@ -16,6 +16,7 @@ import { Resource } from "./components/resource";
 import { Text } from "./components/text";
 import { SpeedDial } from "primereact/speeddial";
 import { Header, TFilter } from "./components/header";
+import { ProgressSpinner } from "primereact/progressspinner";
 
 function getFileNameFromUrl(url) {
   // 使用正则表达式从 URL 中提取文件名
@@ -34,6 +35,7 @@ export function App() {
   const [origin, setOrigin] = useState("");
   const [open, setOpen] = useState(false);
   const [origins, setOrigins] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const [query, setQuery] = useState<TFilter>({
     query: "",
@@ -68,8 +70,10 @@ export function App() {
     return [os, rs];
   }, [query, origins, list]);
 
-  const handleChangeOrigin = (origin: string) => {
-    setOrigin(origin);
+  const handleChangeOrigin = (origin?: string) => {
+    if (origin) {
+      setOrigin(origin);
+    }
     chrome.runtime.sendMessage({
       type: "get-data",
       data: {
@@ -96,8 +100,10 @@ export function App() {
 
   const refresh = () => {
     if (!origin) return;
+
     chrome.tabs.query({ url: origin + "/*" }, function (tabs) {
       if (tabs) {
+        setLoading(true);
         for (const tab of tabs) {
           chrome.tabs.reload(tab.id).then(() => {
             // 监听标签页加载完成事件
@@ -109,12 +115,11 @@ export function App() {
                 console.log(`Tab ${tab.id} loaded`);
                 // 移除监听器
                 chrome.tabs.onUpdated.removeListener(listener);
-                chrome.runtime.sendMessage({
-                  type: "get-data",
-                  data: {
-                    origin: origin,
-                  },
-                });
+                setTimeout(() => {
+                  getOriginList();
+                  handleChangeOrigin(origin);
+                  setLoading(false);
+                }, 100);
               }
             });
           });
@@ -170,7 +175,8 @@ export function App() {
             {viewItem && <Viewer item={viewItem} />}
           </div>
         </Flex>
-        <SpeedDial
+        {/* <SpeedDial
+          visible={true}
           model={[
             {
               label: "Update",
@@ -192,7 +198,20 @@ export function App() {
               },
             },
           }}
-        />
+        /> */}
+        <div className="fixed right-5 bottom-5">
+          <Button
+            icon="pi pi-refresh"
+            rounded
+            severity="secondary"
+            onClick={refresh}
+          />
+        </div>
+        {loading && (
+          <div className="flex justify-center items-center fixed left-0 top-0 w-full h-full bg-gray-200/50">
+            <ProgressSpinner aria-label="Loading" />
+          </div>
+        )}
       </div>
     </PrimeReactProvider>
   );

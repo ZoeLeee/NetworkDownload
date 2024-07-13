@@ -35,11 +35,10 @@ export const Header = ({ origin, filter, onChange }: Props) => {
         />
         <Dropdown
           options={[
-            { name: "Resource", code: "Resource" },
-            { name: "Host", code: "Host" },
+            { name: "Resource", value: "Resource" },
+            { name: "Host", value: "Host" },
           ]}
           optionLabel="name"
-          placeholder="Select a City"
           className="w-2/12"
           value={filter.type}
           onChange={(e) => onChange({ ...filter, type: e.target.value })}

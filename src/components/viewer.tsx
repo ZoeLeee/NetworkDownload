@@ -24,8 +24,8 @@ export const Viewer = ({ item }: { item: TResource }) => {
   // }
 
   return (
-    <div>
-      <Text>功能正在发中。。。</Text>
+    <div className="w-full h-full text-center">
+      <Text className="text-3xl">功能正在发中。。。</Text>
     </div>
   );
 };
