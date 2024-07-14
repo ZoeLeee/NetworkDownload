@@ -1,3 +1,15 @@
+export function getExtensionFromUrl(url: string) {
+	try {
+		// 创建一个 URL 对象
+		const urlObject = new URL(url);
+		// 获取路径部分并提取文件扩展名
+		const pathname = urlObject.pathname;
+		return pathname.split(".").pop()?.toLowerCase();
+	} catch (error) {
+		return "";
+	}
+}
+
 // 根据url获取文件名
 export function getFileNameFromUrl(url: string): string {
 	// Create a URL object
@@ -98,4 +110,12 @@ export function isVideoUrl(url: string): boolean {
 		// 如果 URL 无效，返回 false
 		return false;
 	}
+}
+
+//是否是js文件
+export function isJsFile(url: string) {
+	const jsExtensions = [".js"];
+	// Extract the extension from the URL
+	const extension = getExtensionFromUrl(url);
+	return jsExtensions.includes(`.${extension}`);
 }

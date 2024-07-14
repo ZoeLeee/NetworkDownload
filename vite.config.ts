@@ -5,9 +5,9 @@ import { resolve } from "path";
 // https://vitejs.dev/config/
 export default defineConfig({
 	build: {
-		watch: {
-			exclude: ["src/background.ts"],
-		},
+		// watch: {
+		// 	exclude: ["src/background.ts"],
+		// },
 		emptyOutDir: process.env.CLEAR === "true",
 		minify: false,
 		rollupOptions: {

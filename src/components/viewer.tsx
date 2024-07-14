@@ -1,9 +1,10 @@
-import { is3DFile, isImageFile, isMediaFile } from "../utils";
+import { is3DFile, isImageFile, isJsFile, isMediaFile } from "../utils";
 import { TResource } from "../types";
 import { Model3D } from "./model-3d";
 import { Text } from "./text";
 import { Image } from "primereact/image";
 import { Media } from "./media";
+import { Code } from "./code";
 
 export const Viewer = ({ item }: { item: TResource }) => {
   if (is3DFile(item.url)) {
@@ -22,6 +23,10 @@ export const Viewer = ({ item }: { item: TResource }) => {
   }
   if (isMediaFile(item.url)) {
     return <Media item={item} />;
+  }
+
+  if (isJsFile(item.url)) {
+    return <Code item={item} />;
   }
 
   return (

@@ -7,23 +7,26 @@
     "dev": "vite",
     "build:client": "vite build",
     "build:bg": "vite build --config vite.backgroud.config.ts",
+    "build:c": "vite build --config vite.content.config.ts",
     "preview": "vite preview",
     "build:w": "vite build --watch",
     "build2:w": "vite build --config vite.backgroud.config.ts --watch",
     "build3:w": "vite build --config vite.content.config.ts --watch",
     "bw": "run-p build:w build2:w build3:w",
-    "build": "cross-env CLEAR=true run-s build:client build:bg"
+    "build": "cross-env CLEAR=true run-s build:client build:bg build:c"
   },
   "dependencies": {
     "@babylonjs/core": "^7.10.2",
     "@babylonjs/inspector": "^7.10.2",
     "@babylonjs/loaders": "^7.10.2",
     "@types/chrome": "^0.0.268",
+    "ace-builds": "^1.35.2",
     "framer-motion": "^11.2.10",
     "jszip": "^3.10.1",
     "primeicons": "^7.0.0",
     "primereact": "^10.7.0",
     "react": "^18.3.1",
+    "react-ace": "^12.0.0",
     "react-dom": "^18.3.1"
   },
   "devDependencies": {

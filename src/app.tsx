@@ -117,6 +117,7 @@ export function App() {
 
   useEffect(() => {
     const callback = (message, sender, sendResponse) => {
+      console.log("message: ", message);
       if (message.type === "send-data") {
         setOrigin(message.origin ?? "");
         setList(message.data ?? []);

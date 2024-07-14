@@ -3,6 +3,7 @@ import {
 	getFileNameFromUrl,
 	is3DFile,
 	isImageFile,
+	isJsFile,
 	isMediaFile,
 } from "./utils";
 import { getActivaTab } from "./utils/message";
@@ -76,6 +77,8 @@ chrome.webRequest.onBeforeRequest.addListener(
 				type = "Image";
 			} else if (isMediaFile(details.url)) {
 				type = "Media";
+			} else if (isJsFile(details.url)) {
+				type = "js";
 			} else {
 				//
 			}

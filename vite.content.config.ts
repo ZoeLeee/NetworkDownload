@@ -4,9 +4,9 @@ import { resolve } from "path";
 // https://vitejs.dev/config/
 export default defineConfig({
 	build: {
-		watch: {
-			include: ["src/background.ts"],
-		},
+		// watch: {
+		// 	include: ["src/content.ts"],
+		// },
 		emptyOutDir: false,
 		minify: false,
 		rollupOptions: {
