@@ -1,4 +1,10 @@
-import { is3DFile, isImageFile, isJsFile, isMediaFile } from "../utils";
+import {
+  is3DFile,
+  isCssFile,
+  isImageFile,
+  isJsFile,
+  isMediaFile,
+} from "../utils";
 import { TResource } from "../types";
 import { Model3D } from "./model-3d";
 import { Text } from "./text";
@@ -25,7 +31,7 @@ export const Viewer = ({ item }: { item: TResource }) => {
     return <Media item={item} />;
   }
 
-  if (isJsFile(item.url)) {
+  if (isJsFile(item.url) || isCssFile(item.url)) {
     return <Code item={item} />;
   }
 

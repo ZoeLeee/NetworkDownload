@@ -2,6 +2,7 @@ import { FileMap, TResourceType } from "./types";
 import {
 	getFileNameFromUrl,
 	is3DFile,
+	isCssFile,
 	isImageFile,
 	isJsFile,
 	isMediaFile,
@@ -41,6 +42,11 @@ chrome.action.onClicked.addListener((tab) => {
 
 const UrlMap: Record<string, FileMap> = {};
 
+let loadendTimmer: number;
+let loadTimmer: number;
+
+let loadend = true;
+
 chrome.webRequest.onBeforeRequest.addListener(
 	(details) => {
 		let arr = UrlMap[details.initiator] as FileMap;
@@ -79,6 +85,8 @@ chrome.webRequest.onBeforeRequest.addListener(
 				type = "Media";
 			} else if (isJsFile(details.url)) {
 				type = "js";
+			} else if (isCssFile(details.url)) {
+				type = "css";
 			} else {
 				//
 			}
@@ -104,6 +112,11 @@ chrome.webRequest.onBeforeRequest.addListener(
 		//     "url": "https://accounts.google.com/RotateCookies"
 		// }
 		// 在这里处理请求，可以修改、重定向或阻止它
+		loadend = false;
+		loadTimmer && clearTimeout(loadTimmer);
+		loadTimmer = setTimeout(() => {
+			loadend = true;
+		}, 100);
 	},
 	{ urls: ["<all_urls>"] }, // 匹配所有网址
 );
@@ -136,9 +149,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 			data: Object.keys(UrlMap).filter((item) => item.startsWith("http")),
 		});
 	} else if (message.type === "load") {
-		chrome.runtime.sendMessage({
-			type: "page-load",
-			origin: message.origin,
-		});
+		loadendTimmer && clearInterval(loadendTimmer);
+		loadendTimmer = setInterval(() => {
+			if (!loadend) return;
+			chrome.runtime.sendMessage({
+				type: "page-load",
+				origin: message.origin,
+			});
+			clearInterval(loadendTimmer);
+		}, 1000);
 	}
 });

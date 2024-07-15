@@ -119,3 +119,11 @@ export function isJsFile(url: string) {
 	const extension = getExtensionFromUrl(url);
 	return jsExtensions.includes(`.${extension}`);
 }
+
+//是否是css文件
+export function isCssFile(url: string) {
+	const cssExtensions = [".css"];
+	// Extract the extension from the URL
+	const extension = getExtensionFromUrl(url);
+	return cssExtensions.includes(`.${extension}`);
+}
