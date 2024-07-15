@@ -31,7 +31,7 @@ export const Viewer = ({ item }: { item: TResource }) => {
     return <Media item={item} />;
   }
 
-  if (isJsFile(item.url) || isCssFile(item.url)) {
+  if (["js", "css", "json"].includes(item.resourceType)) {
     return <Code item={item} />;
   }
 

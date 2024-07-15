@@ -127,3 +127,19 @@ export function isCssFile(url: string) {
 	const extension = getExtensionFromUrl(url);
 	return cssExtensions.includes(`.${extension}`);
 }
+
+//是否是wasm文件
+export function isWasmFile(url: string) {
+	const wasmExtensions = [".wasm"];
+	// Extract the extension from the URL
+	const extension = getExtensionFromUrl(url);
+	return wasmExtensions.includes(`.${extension}`);
+}
+
+// 是否是JSON
+export function isJsonFile(url: string) {
+	const jsonExtensions = [".json"];
+	// Extract the extension from the URL
+	const extension = getExtensionFromUrl(url);
+	return jsonExtensions.includes(`.${extension}`);
+}

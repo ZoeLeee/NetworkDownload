@@ -7,7 +7,8 @@ export type TResourceType =
 	| "Other"
 	| "Wasm"
 	| "js"
-	| "css";
+	| "css"
+	| "json";
 
 export type TResource = chrome.webRequest.WebRequestBodyDetails & {
 	resourceType: TResourceType;

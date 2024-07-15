@@ -5,6 +5,7 @@ import {
 	isCssFile,
 	isImageFile,
 	isJsFile,
+	isJsonFile,
 	isMediaFile,
 } from "./utils";
 import { getActivaTab } from "./utils/message";
@@ -87,6 +88,8 @@ chrome.webRequest.onBeforeRequest.addListener(
 				type = "js";
 			} else if (isCssFile(details.url)) {
 				type = "css";
+			} else if (isJsonFile(details.url)) {
+				type = "json";
 			} else {
 				//
 			}

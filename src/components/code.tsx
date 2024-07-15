@@ -11,6 +11,7 @@ import beautify from "ace-builds/src-noconflict/ext-beautify";
 import "ace-builds/src-noconflict/theme-monokai"; // 根据需要选择合适的主题
 import "ace-builds/src-noconflict/mode-javascript"; // 根据需要选择合适的语言模式
 import "ace-builds/src-noconflict/mode-css";
+import "ace-builds/src-noconflict/mode-json";
 import "ace-builds/src-noconflict/ext-beautify";
 import "ace-builds/src-noconflict/ext-searchbox";
 
