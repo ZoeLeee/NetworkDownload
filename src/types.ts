@@ -5,7 +5,7 @@ export type TResourceType =
 	| "Image"
 	| "Media"
 	| "Other"
-	| "Wasm"
+	| "wasm"
 	| "js"
 	| "css"
 	| "json";

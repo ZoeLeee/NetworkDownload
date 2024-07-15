@@ -7,6 +7,7 @@ import {
 	isJsFile,
 	isJsonFile,
 	isMediaFile,
+	isWasmFile,
 } from "./utils";
 import { getActivaTab } from "./utils/message";
 
@@ -90,6 +91,8 @@ chrome.webRequest.onBeforeRequest.addListener(
 				type = "css";
 			} else if (isJsonFile(details.url)) {
 				type = "json";
+			} else if (isWasmFile(details.url)) {
+				type = "wasm";
 			} else {
 				//
 			}

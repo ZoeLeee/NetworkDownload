@@ -11,6 +11,7 @@ import { Text } from "./text";
 import { Image } from "primereact/image";
 import { Media } from "./media";
 import { Code } from "./code";
+import { WasmViewer } from "./wasm";
 
 export const Viewer = ({ item }: { item: TResource }) => {
   if (is3DFile(item.url)) {
@@ -34,6 +35,10 @@ export const Viewer = ({ item }: { item: TResource }) => {
   if (["js", "css", "json"].includes(item.resourceType)) {
     return <Code item={item} />;
   }
+
+  // if (item.resourceType === "wasm") {
+  //   return <WasmViewer item={item} />;
+  // }
 
   return (
     <div className="w-full h-full text-center">
