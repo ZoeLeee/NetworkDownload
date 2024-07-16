@@ -1,6 +1,7 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { resolve } from "path";
+import replace from "@rollup/plugin-replace";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -20,6 +21,10 @@ export default defineConfig({
 	},
 	plugins: [
 		react(),
+		replace({
+			preventAssignment: true,
+			"https://cdn.babylonjs.com": "/",
+		}),
 		{
 			name: "transform-remote-to-local-urls", // 插件名称
 			enforce: "post", // 确保在代码转换后运行此插件
@@ -29,7 +34,7 @@ export default defineConfig({
 				const localUrlReplacement = "$1"; // 用捕获组替换，即匹配的本地路径
 
 				// 替换代码中的远程 URL
-				const transformedCode = code.replace(
+				let transformedCode = code.replace(
 					remoteUrlPattern,
 					localUrlReplacement,
 				);
