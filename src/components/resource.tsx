@@ -6,14 +6,16 @@ import { Button } from "primereact/button";
 import { Tag } from "primereact/tag";
 import { getFileNameFromUrl } from "../utils";
 import JSZip from "jszip";
+import { Text } from "./text";
 
 type Props = {
   list: FileMap;
   look: (url: TResource) => void;
   origin: string;
+  refresh: () => void;
 };
 
-export const Resource = ({ list, look, origin }: Props) => {
+export const Resource = ({ list, look, origin, refresh }: Props) => {
   const [expandedKeys, setExpandedKeys] = useState<any>({});
 
   const downloadUrl = (item: TResource) => {
@@ -174,13 +176,18 @@ export const Resource = ({ list, look, origin }: Props) => {
 
   return (
     <div className="w-1/4 h-full overflow-auto">
+      {items.length === 0 ? (
+        <div className="text-center">
+          <Text className="text-center text-lg">Resource is empty</Text>
+          <Button onClick={refresh}>Refresh</Button>
+        </div>
+      ) : null}
       <PanelMenu
         multiple
         model={items}
         className="w-full h-full"
         expandedKeys={expandedKeys}
         onExpandedKeysChange={(e, ...arg) => {
-          console.log("e: ", e);
           setExpandedKeys(e);
         }}
         pt={{

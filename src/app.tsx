@@ -160,7 +160,7 @@ export function App() {
             setOrigin={handleChangeOrigin}
           />
           <Divider layout="vertical" />
-          <Resource list={filterList} look={look} origin={origin} />
+          <Resource list={filterList} look={look} origin={origin} refresh={refresh} />
           <Divider layout="vertical" />
           <div className="flex-1 w-full h-full overflow-hidden">
             {viewItem && <Viewer item={viewItem} />}
