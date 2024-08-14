@@ -34,15 +34,14 @@ export function is3DFile(url: string) {
 		".gltf",
 		".glb",
 	];
-	// Extract the extension from the URL
-	const extension = url.split(".").pop()?.toLowerCase();
+	const extension = getExtensionFromUrl(url);
 	return threeDExtensions.includes(`.${extension}`);
 }
 
 export function isImageFile(url: string) {
 	const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".svg"];
 	// Extract the extension from the URL
-	const extension = url.split(".").pop()?.toLowerCase();
+	const extension = getExtensionFromUrl(url);
 	return imageExtensions.includes(`.${extension}`);
 }
 
@@ -58,7 +57,7 @@ export function isMediaFile(url: string) {
 		".webm",
 	];
 	// Extract the extension from the URL
-	const extension = url.split(".").pop()?.toLowerCase();
+	const extension = getExtensionFromUrl(url);
 	return mediaExtensions.includes(`.${extension}`);
 }
 
@@ -68,11 +67,7 @@ export function isAudioUrl(url: string): boolean {
 	const audioExtensions = ["mp3", "wav", "ogg", "flac", "aac", "m4a", "wma"];
 
 	try {
-		// 创建一个 URL 对象
-		const urlObject = new URL(url);
-		// 获取路径部分并提取文件扩展名
-		const pathname = urlObject.pathname;
-		const extension = pathname.split(".").pop()?.toLowerCase();
+		const extension = getExtensionFromUrl(url);
 
 		// 检查文件扩展名是否在音频扩展名列表中
 		return extension ? audioExtensions.includes(extension) : false;
@@ -98,11 +93,7 @@ export function isVideoUrl(url: string): boolean {
 	];
 
 	try {
-		// 创建一个 URL 对象
-		const urlObject = new URL(url);
-		// 获取路径部分并提取文件扩展名
-		const pathname = urlObject.pathname;
-		const extension = pathname.split(".").pop()?.toLowerCase();
+		const extension = getExtensionFromUrl(url);
 
 		// 检查文件扩展名是否在视频扩展名列表中
 		return extension ? videoExtensions.includes(extension) : false;
